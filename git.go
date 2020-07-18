@@ -39,6 +39,16 @@ func (g git) CommitMsg() (string, error) {
 	return g.exec("log", "-1", "--pretty=%B")
 }
 
+// CommitMsg returns the commit message of the most recent commit.
+func (g git) CommitFullMsg() (string, error) {
+	commit, err := g.CommitFull()
+	if err != nil {
+		return "", err
+	}
+	return g.exec("log", "--pretty=format:%h %ad - %s [%an]", "-n", "1", commit)
+
+}
+
 // State returns the repository state indicating whether
 // it is "clean" or "dirty".
 func (g git) State() (string, error) {

@@ -28,6 +28,11 @@ func GetFlags(dir string, args []string) (map[string]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get commit message: %v", err)
 	}
+	gitCommitMsgFull, err := repo.CommitFullMsg()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get commit full message: %v", err)
+	}
+
 	gitState, err := repo.State()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get repository state: %v", err)
@@ -46,14 +51,18 @@ func GetFlags(dir string, args []string) (map[string]string, error) {
 	gitCommitMsg = strings.Replace(gitCommitMsg, "'", "\\'", -1)
 	gitCommitMsg = strings.Replace(gitCommitMsg, "-", "\\-", -1)
 
+	gitCommitMsgFull = strings.Replace(gitCommitMsgFull, "-", "\\-", -1)
+	gitCommitMsgFull = strings.Replace(gitCommitMsgFull, "-", "\\-", -1)
+
 	v := map[string]string{
-		pkg + ".BuildDate":     date(),
-		pkg + ".GitCommit":     gitCommit,
-		pkg + ".GitCommitFull": gitCommitFull,
-		pkg + ".GitCommitMsg":  gitCommitMsg,
-		pkg + ".GitBranch":     gitBranch,
-		pkg + ".GitState":      gitState,
-		pkg + ".GitSummary":    gitSummary,
+		pkg + ".BuildDate":        date(),
+		pkg + ".GitCommit":        gitCommit,
+		pkg + ".GitCommitFull":    gitCommitFull,
+		pkg + ".GitCommitMsg":     gitCommitMsg,
+		pkg + ".GitCommitMsgFull": gitCommitMsgFull,
+		pkg + ".GitBranch":        gitBranch,
+		pkg + ".GitState":         gitState,
+		pkg + ".GitSummary":       gitSummary,
 	}
 
 	// calculate the version

@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+type Value string
+
 const versionFile = "VERSION"
 
 // GetFlags collects data to be passed as ldflags.
@@ -48,18 +50,12 @@ func GetFlags(dir string, args []string) (map[string]string, error) {
 		pkg = value
 	}
 
-	gitCommitMsg = strings.Replace(gitCommitMsg, "'", "\\'", -1)
-	gitCommitMsg = strings.Replace(gitCommitMsg, "-", "\\-", -1)
-
-	gitCommitMsgFull = strings.Replace(gitCommitMsgFull, "-", "\\-", -1)
-	gitCommitMsgFull = strings.Replace(gitCommitMsgFull, "-", "\\-", -1)
-
 	v := map[string]string{
 		pkg + ".BuildDate":        date(),
 		pkg + ".GitCommit":        gitCommit,
 		pkg + ".GitCommitFull":    gitCommitFull,
-		pkg + ".GitCommitMsg":     gitCommitMsg,
-		pkg + ".GitCommitMsgFull": gitCommitMsgFull,
+		pkg + ".GitCommitMsg":     Value(gitCommitMsg).transform(),
+		pkg + ".GitCommitMsgFull": Value(gitCommitMsgFull).transform(),
 		pkg + ".GitBranch":        gitBranch,
 		pkg + ".GitState":         gitState,
 		pkg + ".GitSummary":       gitSummary,
@@ -98,4 +94,11 @@ func versionFromFile(dir string) (string, error) {
 		return "", fmt.Errorf("failed to read version file %s: %v", fp, err)
 	}
 	return string(bytes.TrimSpace(b)), nil
+}
+
+func (v Value) transform() string {
+	var text = string(v)
+	text = strings.Replace(text, "'", "\\'", -1)
+	text = strings.Replace(text, "-", "\\-", -1)
+	return text
 }
